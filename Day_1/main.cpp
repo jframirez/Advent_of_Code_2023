@@ -63,7 +63,7 @@ int main(void){
                                     }else{
                                         num_2 = named_numbers_lut[i];
                                     }
-                                    //x += count; -> Research from every character.
+                                    //x += count; -> re-search from every character to find overlap -> eighthree = 8 -> 3
                                     match = true;
                                     break;
                                 }
