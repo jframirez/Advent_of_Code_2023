@@ -1,6 +1,10 @@
 #VSCode
 .vscode/*
 
+#Advent of Code ignore .txt input files
+# Recursively ignore all files matching ".txt"
+**/*.txt
+
 # Prerequisites
 *.d
 
