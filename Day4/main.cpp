@@ -110,8 +110,7 @@ int main(void){
 
     int total_score_p2 = 0;
     for(auto it = scratch_cards.begin(); it != scratch_cards.end(); ++it){
-        std::cout << it->card_number << std::endl;
-        for(int i = 0; i < it->card_count; ++i){
+        //std::cout << it->card_number << std::endl;
             int card_matches = 0;
             for(auto it_numbers_1 = it->sc_numbers.begin(); it_numbers_1 != it->sc_numbers.end(); ++it_numbers_1){
                 for (auto it_got_numbers = it->sc_get.begin(); it_got_numbers != it->sc_get.end(); ++it_got_numbers){
@@ -120,23 +119,22 @@ int main(void){
                     }
                 }
             }
+            
             auto it_next = it;
-            ++it_next;
             for(int i = 0; i < card_matches; ++i){
+                ++it_next;
                 if(it_next == scratch_cards.end()){
                     break;
                 }
-                it_next->card_count += 1;
-                ++it_next;
+                it_next->card_count += 1 * it->card_count;
             }
-        }
     }
 
     std::cout << "PART2 SCORE: " << total_score_p2 << std::endl;
 
     int total = 0;
     for(auto it = scratch_cards.begin(); it != scratch_cards.end(); ++it){
-        std::cout << "\t" << it->card_number << " : " << it->card_count << std::endl;
+        //std::cout << "\t" << it->card_number << " : " << it->card_count << std::endl;
         total += it->card_count;
     }
 
