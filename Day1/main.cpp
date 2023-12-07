@@ -95,5 +95,5 @@ int main(void){
 
     std::cout << "Total: " << total << std::endl;
 
-    return 1;
+    return 0;
 }
