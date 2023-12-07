@@ -36,7 +36,7 @@ int64_t raceWinCombos(std::vector<race> races){
  
 
 int main(void){
-    std::cout << "Advent of Code day 5" << std::endl;
+    std::cout << "Advent of Code day 6" << std::endl;
 
     std::vector<race> races;
 
