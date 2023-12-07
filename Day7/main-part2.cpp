@@ -21,34 +21,76 @@ enum class handType {
 
 // Sorted hand of lenght 5
 handType getHandType(std::list<char> hand_string) {
-    std::cout << "\n\n";
-    // const char * c = NULL;
+    // std::cout << "\n\n";
+    //  const char * c = NULL;
     char c = hand_string.front();
     int counter = 1;
     int total = 0;
+    int jacks_counter = 0;
+    int high_count = 0;
     for (auto it = hand_string.begin(); it != hand_string.end();) {
         c = *it;
         ++it;
+
+        if (c == 'J') {
+            ++jacks_counter;
+        }
+
         if (it == hand_string.end()) {
             // final scoring on end.
             if (counter > 1) {
+                if (counter > high_count) {
+                    high_count = counter;
+                }
                 total += (counter * counter);
             }
             break;
         }
 
-        if (c == *it) {
+        if (c == 'J') {
+
+        } else if (c == *it) {
             counter += 1;
         } else {
             if (counter > 1) {
+                if (counter > high_count) {
+                    high_count = counter;
+                }
                 total += (counter * counter);
             }
             counter = 1;
         }
-        std::cout << c << " : " << *it << " : " << counter << std::endl;
+        // std::cout << c << " : " << *it << " : " << counter << std::endl;
     }
 
-    std::cout << "TOTAL IS : " << total << std::endl;
+    // ADD JACKS TO HIGHEST COMBO, OR AS STANDALONE PAIR
+
+    // BUNCH OF EDGE CASES .....
+    if ((jacks_counter > 0)) {
+
+        if (jacks_counter == 4) {
+            total = (jacks_counter + 1) * (jacks_counter + 1);
+        } else if ((jacks_counter == 3) && (total == 0)) {
+            total = 16;
+        } else if ((jacks_counter == 2) && (total == 0)) {
+            // Two pair of jacks is automatic three of a kind
+            total = (jacks_counter + 1) * (jacks_counter + 1);
+        } else if ((jacks_counter >= 1) && (total == 8)) {
+            total = 13;
+        } else if (high_count >= 2) {
+            total = (jacks_counter + high_count) * (jacks_counter + high_count);
+        } else if (jacks_counter == 1) {
+            total = 4;
+        } else {
+            total = (jacks_counter * jacks_counter);
+            if (total == 1) {
+                total = 0;
+            }
+        }
+        jacks_counter = 0;
+    }
+
+    // std::cout << "TOTAL IS : " << total << std::endl;
 
     // SORT in order
     // 2AK33
@@ -80,29 +122,40 @@ handType getHandType(std::list<char> hand_string) {
     // A1234
     //  0 = high card
 
+    handType before_jacks;
+
     switch (total) {
         case 0:
-            return handType::HIGHCARD;
+            before_jacks = handType::HIGHCARD;
+            break;
         case 4:
-            return handType::ONEPAIR;
+            before_jacks = handType::ONEPAIR;
+            break;
         case 8:
-            return handType::TWOPAIR;
+            before_jacks = handType::TWOPAIR;
+            break;
         case 9:
-            return handType::THREEOFAKIND;
+            before_jacks = handType::THREEOFAKIND;
+            break;
         case 13:
-            return handType::FULLHOUSE;
+            before_jacks = handType::FULLHOUSE;
+            break;
         case 16:
-            return handType::FOUROFAKIND;
+            before_jacks = handType::FOUROFAKIND;
+            break;
         case 25:
-            return handType::FIVEOFAKIND;
+            before_jacks = handType::FIVEOFAKIND;
+            break;
         default:
             std::cout << "CARD COUNT WRONG !!!!!";
             exit(-1);
             break;
     }
+
+    return before_jacks;
 }
 
-// Tailed decrease in importance
+// Tailed decrease in importance -> divided by 100 because of highest numbers
 // i0 score + A * 100000000
 // i1 score + A * 1000000
 // i2 score + A * 10000
@@ -123,8 +176,9 @@ void insertHandToList(hand current_hand, std::list<hand> & list) {
         return;
     }
     for (auto it = list.begin(); it != list.end();) {
-        std::cout << "INSERT TO list: " << current_hand.hand_sort_score << " : "
-                  << it->hand_sort_score << std::endl;
+        // std::cout << "INSERT TO list: " << current_hand.hand_sort_score << "
+        // : "
+        //           << it->hand_sort_score << std::endl;
         if (current_hand.hand_sort_score > it->hand_sort_score) {
             list.insert(it, current_hand);
             return;
@@ -146,20 +200,21 @@ void calcScoreWithOffsets(int64_t & score_counter,
     for (auto it = list.begin(); it != list.end(); ++it) {
         ++score_counter;
         total_score += it->bet_size * score_counter;
-        std::cout << "CALC SCORE, score_counter: " << score_counter
-                  << " TOTAL SCORE : " << total_score << " : " << it->bet_size
-                  << " : " << it->hand_string << std::endl;
+        // std::cout << "CALC SCORE, score_counter: " << score_counter
+        //           << " TOTAL SCORE : " << total_score << " : " <<
+        //           it->bet_size
+        //           << " : " << it->hand_string << std::endl;
     }
 }
 
 int main(void) {
-    std::cout << "Advent of Code day 7, part 1" << std::endl;
+    std::cout << "Advent of Code day 7, part 2" << std::endl;
 
     std::map<char, int> lookup_value = { { 'A', 1 },  { 'K', 2 },  { 'Q', 3 },
-                                         { 'J', 4 },  { 'T', 5 },  { '9', 6 },
-                                         { '8', 7 },  { '7', 8 },  { '6', 9 },
-                                         { '5', 10 }, { '4', 11 }, { '3', 12 },
-                                         { '2', 13 }, { '1', 14 } };
+                                         { 'T', 4 },  { '9', 5 },  { '8', 6 },
+                                         { '7', 7 },  { '6', 8 },  { '5', 9 },
+                                         { '4', 10 }, { '3', 11 }, { '2', 12 },
+                                         { '1', 13 }, { 'J', 14 } };
 
     std::list<hand> five_of_a_kind;
     std::list<hand> four_of_a_kind;
@@ -181,22 +236,18 @@ int main(void) {
     }
 
     std::string line;
-
-    // int input_state = -1;
-
     std::string sub;
-
     std::string state;
 
     int count = 0;
 
     while (std::getline(code_sheet, line)) {
-        std::cout << line << std::endl;
+        // std::cout << line << std::endl;
         std::istringstream iss(line);
         int hand_line_switch = 0;
         hand my_hand;
         while (std::getline(iss, sub, ' ')) {
-            std::cout << sub << std::endl;
+            // std::cout << sub << std::endl;
             if (hand_line_switch == 0) {
                 // Parse hand cards
                 my_hand.hand_string = sub;
@@ -205,7 +256,7 @@ int main(void) {
                 try {
                     my_hand.bet_size = stoi(sub);
                 } catch (const std::exception & e) {
-                    std::cout << "PARSE ERROR?" << std::endl;
+                    // std::cout << "PARSE ERROR?" << std::endl;
                     exit(1);
                 }
                 ++hand_line_switch;
@@ -215,8 +266,8 @@ int main(void) {
     }
 
     for (auto & current_hand : hands) {
-        std::cout << "HAND: " << current_hand.hand_string
-                  << " : BET SIZE: " << current_hand.bet_size << std::endl;
+        // std::cout << "HAND: " << current_hand.hand_string
+        //           << " : BET SIZE: " << current_hand.bet_size << std::endl;
         const char * c = current_hand.hand_string.c_str();
         //
 
@@ -225,7 +276,7 @@ int main(void) {
 
         int64_t hand_score = 0;
         while (*c != '\0') {
-            std::cout << *c << std::endl;
+            // std::cout << *c << std::endl;
 
             // Also calculate high card score;
             hand_score += lookup_value[*c] * mul_val;
@@ -238,7 +289,7 @@ int main(void) {
             } else {
                 for (auto it = current_hand.hand_orderd_char_list.begin();
                      it != current_hand.hand_orderd_char_list.end();) {
-                    std::cout << "IT : " << *c << " : " << *it << std::endl;
+                    // std::cout << "IT : " << *c << " : " << *it << std::endl;
                     if (*c <= *it) {
                         current_hand.hand_orderd_char_list.insert(it, *c);
                         break;
@@ -259,46 +310,45 @@ int main(void) {
     }
 
     for (const auto & current_hand : hands) {
-        std::cout << "HAND: " << current_hand.hand_string
-                  << " : BET SIZE: " << current_hand.bet_size
-                  << " : ORDERD LIST: ";
+        // std::cout << "HAND: " << current_hand.hand_string << " : BET SIZE: "
+        // << current_hand.bet_size << " : ORDERD LIST:";
         for (auto it = current_hand.hand_orderd_char_list.begin();
              it != current_hand.hand_orderd_char_list.end();
              ++it) {
-            std::cout << *it;
+            // std::cout << *it;
         }
 
         handType my_hand_type = getHandType(current_hand.hand_orderd_char_list);
-        std::cout << " : HIGH_CARD_SCORE : " << current_hand.hand_sort_score
-                  << " : HAND TYPE: " << int(my_hand_type) << std::endl;
+        // std::cout << " : HIGH_CARD_SCORE : " << current_hand.hand_sort_score
+        // << " : HAND TYPE: " << int(my_hand_type) << std::endl;
 
         switch (my_hand_type) {
             case handType::FIVEOFAKIND:
-                std::cout << "INSERT FIVE OF A KIND" << std::endl;
+                // std::cout << "INSERT FIVE OF A KIND" << std::endl;
                 insertHandToList(current_hand, five_of_a_kind);
                 break;
             case handType::FOUROFAKIND:
-                std::cout << "INSERT FOUR OF A KIND" << std::endl;
+                // td::cout << "INSERT FOUR OF A KIND" << std::endl;
                 insertHandToList(current_hand, four_of_a_kind);
                 break;
             case handType::FULLHOUSE:
-                std::cout << "INSERT FULL HOUSE" << std::endl;
+                // std::cout << "INSERT FULL HOUSE" << std::endl;
                 insertHandToList(current_hand, full_house);
                 break;
             case handType::HIGHCARD:
-                std::cout << "INSERT HIGHCARD" << std::endl;
+                // std::cout << "INSERT HIGHCARD" << std::endl;
                 insertHandToList(current_hand, high_card);
                 break;
             case handType::ONEPAIR:
-                std::cout << "INSERT ONEPAIR" << std::endl;
+                // std::cout << "INSERT ONEPAIR" << std::endl;
                 insertHandToList(current_hand, one_pair);
                 break;
             case handType::THREEOFAKIND:
-                std::cout << "INSERT THREE OF A KIND" << std::endl;
+                // std::cout << "INSERT THREE OF A KIND" << std::endl;
                 insertHandToList(current_hand, three_of_a_kind);
                 break;
             case handType::TWOPAIR:
-                std::cout << "INSERT TWO PAIR" << std::endl;
+                // std::cout << "INSERT TWO PAIR" << std::endl;
                 insertHandToList(current_hand, two_pair);
                 break;
             default:
@@ -309,42 +359,42 @@ int main(void) {
     int64_t score_counter = 0;
     int64_t total_score = 0;
 
-    for (const auto & my_hand : high_card) {
-        std::cout << "HIGH CARDS" << my_hand.hand_string << std::endl;
-    }
+    // for (const auto &my_hand : high_card) {
+    // std::cout << "HIGH CARDS" << my_hand.hand_string << std::endl;
+    //}
 
     calcScoreWithOffsets(score_counter, total_score, high_card);
 
-    std::cout << "TOTAL SCORE : " << total_score
-              << " : score_counter: " << score_counter << std::endl;
+    // std::cout << "TOTAL SCORE high card : " << total_score << " :
+    // score_counter: " << score_counter << std::endl;
 
     calcScoreWithOffsets(score_counter, total_score, one_pair);
 
-    std::cout << "TOTAL SCORE : " << total_score
-              << " : score_counter: " << score_counter << std::endl;
+    // std::cout << "TOTAL SCORE one pair: " << total_score << " :
+    // score_counter: " << score_counter << std::endl;
 
     calcScoreWithOffsets(score_counter, total_score, two_pair);
 
-    std::cout << "TOTAL SCORE : " << total_score
-              << " : score_counter: " << score_counter << std::endl;
+    // std::cout << "TOTAL SCORE two pair: " << total_score << " :
+    // score_counter: " << score_counter << std::endl;
 
     calcScoreWithOffsets(score_counter, total_score, three_of_a_kind);
 
-    std::cout << "TOTAL SCORE : " << total_score
-              << " : score_counter: " << score_counter << std::endl;
+    // std::cout << "TOTAL SCORE three of: " << total_score << " :
+    // score_counter: " << score_counter << std::endl;
 
     calcScoreWithOffsets(score_counter, total_score, full_house);
 
-    std::cout << "TOTAL SCORE : " << total_score
-              << " : score_counter: " << score_counter << std::endl;
+    // std::cout << "TOTAL SCORE full house: " << total_score << " :
+    // score_counter: " << score_counter << std::endl;
 
     calcScoreWithOffsets(score_counter, total_score, four_of_a_kind);
 
-    std::cout << "TOTAL SCORE : " << total_score
-              << " : score_counter: " << score_counter << std::endl;
+    // std::cout << "TOTAL SCORE four of: " << total_score << " : score_counter:
+    // " << score_counter << std::endl;
 
     calcScoreWithOffsets(score_counter, total_score, five_of_a_kind);
 
-    std::cout << "END TOTAL SCORE : " << total_score
+    std::cout << "END TOTAL SCORE five of: " << total_score
               << " : score_counter: " << score_counter << std::endl;
 }
