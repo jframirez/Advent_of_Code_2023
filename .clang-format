@@ -1,0 +1,25 @@
+﻿---
+BasedOnStyle: Mozilla
+AlignOperands:   Align
+AlignTrailingComments: true
+AccessModifierOffset: -4
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+IndentWidth:     4
+ObjCBlockIndentWidth: 4
+AlignAfterOpenBracket: Align
+AllowShortBlocksOnASingleLine: 'false'
+AllowShortCaseLabelsOnASingleLine: 'false'
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortLoopsOnASingleLine: 'false'
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: 'false'
+BreakBeforeBraces: Attach
+PointerAlignment: Middle
+ReflowComments: 'true'
+SpaceAfterTemplateKeyword: 'false'
+SpaceBeforeAssignmentOperators: 'true'
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+
+...
