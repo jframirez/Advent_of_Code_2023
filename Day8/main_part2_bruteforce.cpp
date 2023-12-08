@@ -9,28 +9,8 @@
 #include <string>
 #include <vector>
 
-int64_t greatest_common_divider(int64_t a, int64_t b) {
-    while (b) {
-        auto temp_b = b;
-        b = a % b;
-        a = temp_b;
-    }
-    return a;
-}
-
-int64_t lowest_common_multiple(int64_t a, int64_t b) {
-    std::cout << "\t\t\tLCM: " << a << " : " << b << std::endl;
-    return (std::abs(a * b) / greatest_common_divider(a, b));
-}
-
-struct metaData {
-    std::string node_string;
-    int64_t first_z = 0;
-    int64_t second_z = 0;
-};
-
 int main(void) {
-    std::cout << "Advent of Code day 8, part 2" << std::endl;
+    std::cout << "Advent of Code day 8" << std::endl;
 
     std::map<std::string, std::pair<std::string, std::string>> network;
 
@@ -68,6 +48,8 @@ int main(void) {
 
     std::string first_entry = "";
 
+    std::cout << instructions.size() << std::endl;
+
     int count = 0;
 
     while (std::getline(code_sheet, line)) {
@@ -91,17 +73,22 @@ int main(void) {
 
                 if (counter == 3) {
                     if (index_counter == 0) {
+
+                        // Add new to map
                         entry = subline;
+
                         if (first_entry == "") {
                             first_entry = entry;
                         }
                         ++index_counter;
 
                     } else if (index_counter == 1) {
+
                         pos1 = subline;
                         ++index_counter;
 
                     } else if (index_counter == 2) {
+
                         pos2 = subline;
                         std::pair<std::string, std::string> current_pair = {
                             pos1, pos2
@@ -117,21 +104,21 @@ int main(void) {
         }
     }
 
-    // for (const auto & graph_entry : network) {
-    //     std::cout << "G: " << graph_entry.first
-    //               << ": L: " << graph_entry.second.first
-    //               << " , R: " << graph_entry.second.second << std::endl;
-    // }
+    for (const auto & graph_entry : network) {
+        std::cout << "G: " << graph_entry.first
+                  << ": L: " << graph_entry.second.first
+                  << " , R: " << graph_entry.second.second << std::endl;
+    }
 
     int instruction_count = 0;
 
     std::list<std::pair<std::string, std::string>> node_list;
 
-    std::list<metaData> node_starting_points;
+    std::list<std::string> node_starting_points;
 
     for (const auto & node : network) {
         if (*(node.first.end() - 1) == 'A') {
-            node_starting_points.push_back({ node.first });
+            node_starting_points.push_back(node.first);
         }
     }
 
@@ -148,15 +135,9 @@ int main(void) {
 
             //   EXIT CONDITION
             int count_z_end_match = 0;
-            for (auto & node_string : node_starting_points) {
-                if ((node_string.first_z > 0) && (node_string.second_z > 0)) {
+            for (const auto & node_string : node_starting_points) {
+                if (*(node_string.end() - 1) == 'Z') {
                     ++count_z_end_match;
-                } else if (*(node_string.node_string.end() - 1) == 'Z') {
-                    if (node_string.first_z == 0) {
-                        node_string.first_z = instruction_count;
-                    } else {
-                        node_string.second_z = instruction_count;
-                    }
                 }
             }
 
@@ -168,41 +149,21 @@ int main(void) {
             }
 
             for (auto & node : node_starting_points) {
-                auto current_element = network[node.node_string];
+                auto current_element = network[node];
+                //  UPDATE ALL NODES
                 if (instructions[i] == 0) { // LEFT
-                    node.node_string = current_element.first;
+                    node = current_element.first;
                 }
 
                 if (instructions[i] == 1) { // RIGHT
-                    node.node_string = current_element.second;
+                    node = current_element.second;
                 }
             }
 
             ++instruction_count;
         }
-        // std::cout << instruction_count << std::endl;
+        std::cout << instruction_count << std::endl;
     }
 
     std::cout << "INSTRUCTION COUNT: " << instruction_count << std::endl;
-
-    for (const auto & node : node_starting_points) {
-        std::cout << node.node_string << " : " << node.first_z << " : "
-                  << node.second_z << " : " << (node.second_z - node.first_z)
-                  << std::endl;
-    }
-
-    auto it = node_starting_points.begin();
-    ++it;
-    auto prev_value = lowest_common_multiple(
-        node_starting_points.begin()->first_z, it->first_z);
-    std::cout << "\t\t" << prev_value << std::endl;
-
-    for (; it != node_starting_points.end(); ++it) {
-        prev_value = lowest_common_multiple(prev_value, it->first_z);
-        std::cout << "\t\t" << prev_value << std::endl;
-    }
-
-    std::cout << "INSTRUCTION COUNT: " << prev_value << std::endl;
-    // All loops are aligned at the start ( loop size == loop start ), so no
-    // need to mitigate first alignment
 }
