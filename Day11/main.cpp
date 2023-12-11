@@ -58,7 +58,7 @@ int main(void) {
     std::vector<int> column_offset;
     while (std::getline(code_sheet, line)) {
         row_offset.push_back(0);
-        std::cout << line << std::endl;
+        //std::cout << line << std::endl;
         input_grid.push_back({});
         const char * c = line.c_str();
         if (column_offset.size() != line.size()) {
